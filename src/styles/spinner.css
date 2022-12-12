@@ -1,0 +1,43 @@
+.spinner {
+	position: relative;
+	width: 24.6px;
+	height: 24.6px;
+ }
+ 
+ .spinner div {
+	animation: spinner-4t3wzl 2.25s infinite backwards;
+	border-radius: 50%;
+	height: 100%;
+	position: absolute;
+	width: 100%;
+ }
+ 
+ .spinner div:nth-child(1) {
+	animation-delay: 0.18s;
+ }
+ 
+ .spinner div:nth-child(2) {
+	animation-delay: 0.36s;
+ }
+ 
+ .spinner div:nth-child(3) {
+	animation-delay: 0.54s;
+ }
+ 
+ .spinner div:nth-child(4) {
+	animation-delay: 0.72s;
+ }
+ 
+ .spinner div:nth-child(5) {
+	animation-delay: 0.8999999999999999s;
+ }
+ 
+ @keyframes spinner-4t3wzl {
+	0% {
+	   transform: rotate(0deg) translateY(-200%);
+	}
+ 
+	60%, 100% {
+	   transform: rotate(360deg) translateY(-200%);
+	}
+ }
