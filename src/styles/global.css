@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .base-gradient {
+      @apply from-primary-color to-secondary-color;
+    }
+}
