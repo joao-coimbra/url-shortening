@@ -4,7 +4,7 @@ const API_URL = "http://localhost:8080/api/short/url";
 
 export const api = {
     create(originURL, shortId) {
-        return axios.post(API_URL, {url: originURL, UD: shortId})
+        return axios.post(API_URL, {url: originURL, id: shortId})
     },
 	getOne(id) {
 		return axios.get(API_URL + "/" + id);
