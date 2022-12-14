@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
-import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
+import {
+	ArrowPathRoundedSquareIcon,
+	ClipboardDocumentIcon,
+	TrashIcon,
+} from "@heroicons/react/24/outline";
 
 import { LocalStorage } from "../services/cache/LocalStorage.service";
 import { api } from "../services/api/url.api";
@@ -14,8 +18,6 @@ function Landing() {
 	const [lastUrls, setLastUrls] = useState(
 		JSON.parse(LocalStorage.get("last-urls") || "[]")
 	);
-
-	console.log(lastUrls);
 
 	useEffect(() => {
 		// console.log(new Date().getTime() > +LocalStorage.get("expire"));
@@ -159,27 +161,29 @@ function Landing() {
 				</div>
 
 				<div className='max-md:mt-8 h-fit sticky top-0 basis-2/5 w-full'>
-					<Aside urls={lastUrls} />
+					<Aside urls={lastUrls} setUrls={setLastUrls} />
 				</div>
 			</div>
 		</div>
 	);
 }
 
-const Aside = ({ urls }) => {
+const Aside = ({ urls, setUrls }) => {
 	return (
 		<aside>
 			<span className='font-semibold'>
 				Suas últimas URLs publicadas aqui
 			</span>
-			<ul className='space-y-2 mt-2 md:mt-4 divide-y divide-dashed'>
+			<ul className='space-y-2 md:mt-4 divide-y divide-dashed'>
 				{urls.map((url) => (
-					<li key={url.shortId}>
-						<div className='flex justify-between'>
-							<Link
-								className='truncate max-w-[60%]'
-								to={"/" + url.shortId}
-							>
+					<li key={url.shortId} className='group relative pt-2 flex'>
+						<a
+							href={url.originURL}
+							className='w-full flex flex-col'
+							target='_blank'
+							rel='noreferrer'
+						>
+							<div className='truncate max-w-[60%]'>
 								<span className='max-md:hidden'>
 									{window.location.origin}
 								</span>
@@ -187,19 +191,71 @@ const Aside = ({ urls }) => {
 								<span className='bg-gradient-to-l base-gradient text-transparent bg-clip-text font-bold'>
 									{url.shortId}
 								</span>
-							</Link>
-							<div className='space-x-3'>
-								<button>COPY</button>
-								<button>DEL</button>
 							</div>
+							<small className='text-slate-400 truncate max-w-[30ch]'>
+								{url.originURL}
+							</small>
+						</a>
+						<div className='space-x-1.5 absolute max-md:top-3 right-0 duration-200 md:opacity-0 group-hover:opacity-100 md:scale-0 group-hover:scale-100 inline-flex'>
+							<ButtonCopy url={url} />
+							<button
+								title='deletar'
+								onClick={(e) => {
+									urls.splice(
+										urls
+											.map((u) => u.shortId)
+											.indexOf(url.shortId),
+										1
+									);
+									setUrls([...urls]);
+									LocalStorage.set(
+										"last-urls",
+										JSON.stringify([...urls])
+									);
+									e.preventDefault();
+								}}
+							>
+								<TrashIcon className='w-7 p-0.5 border rounded text-slate-400 hover:bg-red-400 hover:text-white' />
+							</button>
 						</div>
-						<small className='text-slate-400'>
-							{url.originURL}
-						</small>
 					</li>
 				))}
 			</ul>
 		</aside>
+	);
+};
+
+const ButtonCopy = ({ url }) => {
+	const [copy, setCopy] = useState(false);
+
+	return (
+		<button
+			title='copiar'
+			onClick={(e) => {
+				navigator.clipboard
+					.writeText(window.location.origin + "/" + url.shortId)
+					.then(
+						function () {
+							setCopy(true);
+							setTimeout(() => setCopy(false), 1500);
+						},
+						function (err) {
+							console.error("Async: Could not copy text: ", err);
+						}
+					);
+				e.preventDefault();
+			}}
+			className='relative flex flex-col items-center'
+		>
+			<ClipboardDocumentIcon className='w-7 p-0.5 border rounded text-slate-400 hover:bg-primary-color hover:text-white' />
+			<span
+				className={`absolute top-full mt-px text-xs text-slate-600 duration-200 ${
+					copy ? "" : "-translate-y-[100%] scale-0 opacity-0"
+				}`}
+			>
+				copiado!
+			</span>
+		</button>
 	);
 };
 
